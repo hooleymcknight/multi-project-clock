@@ -17,3 +17,4 @@ This app was developed originally for freelancers to track time on multiple proj
 - lock screen feature
 - indicator on toolbar icon that a timer is active
 - combine start/stop into a single button that toggles, and reduce the size of the "restart" button
+- sum line for total hours for the day
