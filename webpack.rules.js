@@ -26,6 +26,13 @@ module.exports = [
       }
     }
   },
+  // {
+  //   test: /\.js$/,
+  //   exclude: 'node_modules',
+  //   loader: 'babel',
+  //   query: {presets: ['es2015']},
+  // }
+  
   // Put your webpack loader rules in this array.  This is where you would put
   // your ts-loader configuration for instance:
   /**

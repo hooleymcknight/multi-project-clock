@@ -1,7 +1,142 @@
+@font-face {
+  font-family: "Titillium Web Black";
+  src: url("./assets/TitilliumWeb-Black.ttf");
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url('./assets/Poppins-Regular.ttf');
+}
+
+:root {
+  --light-bg: #f2f2f2;
+  --dark-purple: #4f1665;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: 'Poppins';
   margin: auto;
   max-width: 38rem;
   padding: 2rem;
+  background-color: var(--light-bg);
+}
+
+.time {
+  display: flex;
+  gap: 10px;
+}
+
+.timeElement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeElement.divider {
+  font-size: 32px;
+}
+
+.time .digit {
+  font-size: 36px;
+}
+
+.time .txt {
+  display: none;
+}
+
+button.btn {
+  background: var(--dark-purple);
+  color: #fff;
+  border: 2px solid var(--dark-purple);
+  text-transform: uppercase;
+  padding: 8px 20px;
+  margin: 0 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Titillium Web Black';
+  letter-spacing: 1.2px;
+  font-size: 20px;
+}
+
+button.btn:hover {
+  background: #fff;
+  color: var(--dark-purple);
+}
+
+button#add {
+  position: fixed;
+  z-index: 3;
+  top: 20px;
+  right: 20px;
+  font-size: 36px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stopwatch-section {
+  position: relative;
+  padding: 10px 10px 10px 50px;
+}
+
+.stopwatch-section .sw-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.stopwatch-section .sw-header h2 {
+  margin: 5px 0;
+}
+
+.stopwatch-section:hover button#remove {
+  display: flex;
+}
+
+button#edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+/* button#edit svg {
+  padding: 3px;
+}
+
+button#edit:hover svg {
+  background: var(--dark-purple);
+  border-radius: 6px;
+  color: #fff;
+} */
+
+button#edit:hover svg {
+  color: var(--dark-purple);
+}
+
+button#remove {
+  background: none;
+  border: none;
+  padding: 6px;
+  display: none;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 10px;
+  cursor: pointer;
+}
+
+button#remove svg {
+  color: var(--dark-purple);
+  font-size: 32px;
+  padding: 0 2px;
+}
+
+button#remove:hover svg {
+  background: var(--dark-purple);
+  color: #fff;
+  border-radius: 6px;
 }
