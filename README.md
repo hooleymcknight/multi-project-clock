@@ -1,8 +1,8 @@
 # Multi-Project Clock
 
-## This app handles multiple stopwatches to help people track multiple timers.
+#### This app handles multiple stopwatches to help people track multiple timers.
 
-### This app was developed originally for freelancers to track time on multiple projects, so when a new timer is started, previous ones are paused.
+This app was developed originally for freelancers to track time on multiple projects, so when a new timer is started, previous ones are paused.
 
 ## Future updates
 
