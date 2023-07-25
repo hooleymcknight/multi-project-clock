@@ -12,3 +12,4 @@ This app was developed originally for freelancers to track time on multiple proj
 - stop and save active timer on window close
 - edit name should submit on Enter key press
 - simultaneous timer mode (multiple timers can run at once)
+- combine start/stop into a single button that toggles, and reduce the size of the "restart" button
