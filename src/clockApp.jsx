@@ -3,14 +3,30 @@ import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencil, faCheck, faSquareXmark, faPlus } from '@fortawesome/free-solid-svg-icons'
 import Timer from "./components/timer.jsx";
+import ConfirmModal from './components/confirmModal.jsx';
 const ipcRenderer = window.require('electron').ipcRenderer;
+
+ipcRenderer.on('darkModeToggle', (event, data) => {
+    if (data) {
+        document.documentElement.classList.add('dark-mode');
+    }
+    else {
+        document.documentElement.classList.remove('dark-mode');
+    }
+})
 
 const ClockApp = () => {
     const [timersData, setTimersData] = React.useState([])
     const [editing, setEditing] = React.useState('');
     const [isInputValid, setIsInputValid] = React.useState(true);
+    const [deleting, setDeleting] = React.useState('');
+    const [isAggro, setIsAggro] = React.useState(false);
 
-    const stopHandler = (timer) => {
+    ipcRenderer.on('aggroModeToggle', (event, data) => {
+        setIsAggro(data);
+    })
+
+    const stopHandler = (timer, closingWindow) => {
         const newCount = timer.dataset.count;
         const timerId = timer.id;
 
@@ -18,13 +34,30 @@ const ClockApp = () => {
         const indexToReplace = newTimersData.indexOf(newTimersData.filter(x => x.name === timerId)[0]);
         newTimersData[indexToReplace] = { name: timerId, count: newCount };
         ipcRenderer.send('updateSavedTimers', newTimersData);
-        setTimersData(newTimersData);
+
+        if (closingWindow) {
+            ipcRenderer.send('closeWindow');
+        }
+        else {
+            setTimersData(newTimersData);
+        }
     }
 
     const openEditName = (e) => {
         const container = e.target.closest('.stopwatch-section')
         const timerId = container.querySelector('.stopwatch').id;
         setEditing(timerId);
+    }
+
+    const handleKeyPress = (e) => {
+        if (!e.code) return;
+
+        if (e.code === 'Enter') {
+            closeEditName(e);
+        }
+        else if (e.code === 'Escape') {
+            setEditing('');
+        }
     }
 
     const closeEditName = (e) => {
@@ -62,23 +95,48 @@ const ClockApp = () => {
         setTimersData(newTimersData);
     }
 
-    const removeHandler = (e) => {
-        const container = e.target.closest('.stopwatch-section')
+    const triggerRemoveModal = (e) => {
+        const container = e.target.closest('.stopwatch-section');
         const timerId = container.querySelector('.stopwatch').id;
+
+        setDeleting(timerId);
+    }
+
+    const removeHandler = (e, timerId) => {
+        const container = e.target.closest('.clock-app').querySelector(`[id="${timerId}"]`);
 
         let newTimersData = [...timersData];
         newTimersData = newTimersData.filter(x => x.name !== timerId);
         ipcRenderer.send('addOrDelete', newTimersData);
         setTimersData(newTimersData);
+        setDeleting('');
     }
 
     React.useEffect(() => {
+        ipcRenderer.on('saveTimers', () => {
+            const activeTimers = document.querySelectorAll('.stopwatch.active');
+            if (activeTimers.length) {
+                activeTimers.forEach((timer) => {
+                    stopHandler(timer, true);
+                    ipcRenderer.send('saveTimersReply', timersData);
+                });
+            }
+            else {
+                ipcRenderer.send('closeWindow');
+            }
+        });
+
+        ipcRenderer.send('requestAggro');
+        ipcRenderer.on('sendAggroState', (event, data) => {
+            setIsAggro(data);
+        })
+
         if (timersData.length > 0) return;
         ipcRenderer.send('loadSavedTimers', []);
         ipcRenderer.on('loadSavedTimersReply', (event, data) => {
             setTimersData(data);
         })
-    }, [timersData])
+    }, [timersData]);
 
     return (
         <main className="clock-app">
@@ -88,7 +146,7 @@ const ClockApp = () => {
                         
                         {editing == x.name ? 
                             <div className="sw-header">
-                                <input type="text" defaultValue={x.name} onChange={(e) => validateInput(e)}></input>
+                                <input type="text" defaultValue={x.name} onChange={(e) => validateInput(e)} onKeyUp={(e) => handleKeyPress(e)}></input>
                                 <button id="edit" disabled={!isInputValid} onClick={(e) => closeEditName(e)}><FontAwesomeIcon icon={faCheck} /></button>
                             </div>
                         :
@@ -98,7 +156,7 @@ const ClockApp = () => {
                             </div>
                         }
 
-                        <button id="remove" onClick={(e) => removeHandler(e)}>
+                        <button id="remove" onClick={(e) => triggerRemoveModal(e)}>
                             <FontAwesomeIcon icon={faSquareXmark} />
                         </button>
 
@@ -109,6 +167,11 @@ const ClockApp = () => {
             <button className="btn" id="add" onClick={() => addHandler()}>
                 <FontAwesomeIcon icon={faPlus} />
             </button>
+            {deleting ?
+                <ConfirmModal name={deleting} aggro={isAggro} onDelete={(e) => removeHandler(e, deleting)} onCancel={() => setDeleting('')} />
+            :
+                ''
+            }
         </main>
     );
 }

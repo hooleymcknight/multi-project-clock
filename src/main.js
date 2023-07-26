@@ -1,7 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, nativeImage } = require('electron');
 const path = require('path');
 const Store = require('./store.js');
+
+// import template from './helpers/menu.js'
+
 let mainWindow;
+let closedBySelf = false;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -21,6 +25,99 @@ const store = new Store({
   }
 });
 
+const template = [
+  // { role: 'appMenu' }
+  // ...(isMac
+  //     ? [{
+  //         label: app.name,
+  //         submenu: [
+  //         { role: 'about' },
+  //         { type: 'separator' },
+  //         { role: 'services' },
+  //         { type: 'separator' },
+  //         { role: 'hide' },
+  //         { role: 'hideOthers' },
+  //         { role: 'unhide' },
+  //         { type: 'separator' },
+  //         { role: 'quit' }
+  //         ]
+  //     }]
+  //     : []),
+  // { role: 'fileMenu' }
+  {
+      label: 'File',
+      submenu: [
+      // isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+  },
+  {
+    label: 'Settings',
+    submenu: [
+      {
+        label: 'Aggro Mode',
+        type: 'checkbox',
+        checked: store.get('aggroMode') ? store.get('aggroMode') : false,
+        click: (menuItem, browserWindow, event) => {
+          browserWindow.webContents.send('aggroModeToggle', menuItem.checked);
+          store.set('aggroMode', menuItem.checked);
+        }
+      }
+    ]
+  },
+  // { role: 'viewMenu' }
+  {
+      label: 'View',
+      submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { role: 'togglefullscreen' },
+      { 
+          label: 'Toggle Dark Mode',
+          type: 'checkbox',
+          checked: store.get('darkMode') ? store.get('darkMode') : false,
+          click: (menuItem, browserWindow, event) => {
+              browserWindow.webContents.send('darkModeToggle', menuItem.checked);
+              store.set('darkMode', menuItem.checked);
+          }
+      }
+      ]
+  },
+  // { role: 'windowMenu' }
+  {
+      label: 'Window',
+      submenu: [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      // ...(isMac
+      //     ? [
+      //         { type: 'separator' },
+      //         { role: 'front' },
+      //         { type: 'separator' },
+      //         { role: 'window' }
+      //     ]
+      //     : [
+      //         { role: 'close' }
+      //     ])
+      ]
+  },
+  {
+      role: 'help',
+      submenu: [
+      {
+          label: 'See My Portfolio',
+          click: async () => {
+          const { shell } = require('electron')
+          await shell.openExternal('https://hooleymcknight.com/')
+          }
+      }
+      ]
+  }
+]
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
+
 const createWindow = () => {
   let { width, height } = store.get('windowBounds');
   let x = store.get('windowPosition')?.x;
@@ -29,6 +126,7 @@ const createWindow = () => {
   let settings = { 
     width,
     height,
+    icon: path.join(__dirname + './../../src/assets/mpc_icon_200.png'),
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInSubFrames: true,
@@ -47,15 +145,36 @@ const createWindow = () => {
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  if (store.get('darkMode')) {
+    mainWindow.webContents.on('did-finish-load', () => {
+      mainWindow.webContents.send('darkModeToggle', true);
+    })
+  }
+
+  if (store.get('aggroMode')) {
+    mainWindow.webContents.on('did-finish-load', () => {
+      mainWindow.webContents.send('aggroModeToggle', true);
+    })
+  }
+
+  
+
   mainWindow.on('resize', () => {
-    let { width, height } = mainWindow.getBounds();
+    const { width, height } = mainWindow.getBounds();
     store.set('windowBounds', { width, height });
   });
 
   mainWindow.on('moved', () => {
-    let [ x, y ] = mainWindow.getPosition();
+    const [ x, y ] = mainWindow.getPosition();
     store.set('windowPosition', { x, y });
   });
+
+  mainWindow.on('close', (e) => {
+    if (!closedBySelf) {
+      e.preventDefault();
+      mainWindow.webContents.send('saveTimers');
+    }
+  })
 }
 
 // This method will be called when Electron has finished
@@ -85,14 +204,32 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
+ipcMain.on('closeWindow', (event, data) => {
+  closedBySelf = true;
+  mainWindow.close();
+});
+
 ipcMain.on('addOrDelete', (event, data) => {
   store.set('clientTimers', data);
 });
 
 ipcMain.on('loadSavedTimers', (event, data) => {
   event.reply('loadSavedTimersReply', store.get('clientTimers'));
-})
+});
 
 ipcMain.on('updateSavedTimers', (event, data) => {
   store.set('clientTimers', data);
+});
+
+ipcMain.on('requestAggro', (event, data) => {
+  event.reply('sendAggroState', store.get('aggroMode'));
+});
+
+ipcMain.on('timersToggled', (event, data) => {
+  if (data) {
+    mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname + './../../src/assets/mpc_icon_overlay2.png')), 'timers are going');
+  }
+  else {
+    mainWindow.setOverlayIcon(null, 'timers are all stopped');
+  }
 })

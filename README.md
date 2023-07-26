@@ -4,18 +4,26 @@
 
 This app was developed originally for freelancers to track time on multiple projects, so when a new timer is started, previous ones are paused.
 
-## Future updates
+## Recent updates
 
-- edit name should submit on Enter key press
-- timers should save user data on Reset button click
-- stop and save active timer on window close
+- active timer stops and saves when window is closed
+- edit name submits on Enter key press
+- timers now save user data on Reset button click
 - dark mode toggle
 - new app icon
-- user should get a prompt after clicking delete client button: "are you sure?"
+- Esc key in edit name cancels edit
+- user gets a prompt after clicking delete client button: "are you sure?"
+- indicator on toolbar icon that a timer is active (taskbar icon overlay)
+
+## Future updates
+
 - edit time
-- simultaneous timer mode (multiple timers can run at once)
-- lock screen feature
-- indicator on toolbar icon that a timer is active
-- combine start/stop into a single button that toggles, and reduce the size of the "restart" button
 - sum line for total hours for the day
 - clear all button
+- lock screen feature
+- simultaneous timer mode (multiple timers can run at once)
+- combine start/stop into a single button that toggles, and reduce the size of the "restart" button
+- add thumbnail toolbars for taskbar control
+- put taskbar icon overlay in top-right corner
+- simultaneous timer mode icon overlay shows number of live timers
+- make use of helpers/menu.js rather than having the menu template in main.js
