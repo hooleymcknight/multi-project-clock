@@ -18,6 +18,8 @@ This app was developed originally for freelancers to track time on multiple proj
 ## Future updates
 
 - edit time
+- reorder clients
+- duplicate client names should not be allowed (causes bugs)
 - sum line for total hours for the day
 - clear all button
 - lock screen feature
