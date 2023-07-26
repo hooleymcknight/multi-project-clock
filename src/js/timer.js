@@ -1,3 +1,5 @@
+const ipcRenderer = window.require('electron').ipcRenderer;
+
 function stopWatch(timer, hour, minute, second, count, totalCount) {
     if (timer.classList.contains('active')) {
         count++;
@@ -80,8 +82,6 @@ const startTimer = (e, props) => {
     let second;
     let count;
 
-    console.log(totalCount);
-
     if (totalCount > 0) {
         let timeObj = msToTime(totalCount)
         hour = timeObj.setHours;
@@ -117,6 +117,7 @@ const startTimer = (e, props) => {
         prevTimer.classList.remove('active');
     }
 
+    ipcRenderer.send('timersToggled', true);
     stopWatch(timer, hour, minute, second, count, totalCount);
 }
 
@@ -124,15 +125,22 @@ const stopTimer = (e, props) => {
     const timer = e.target.closest('.stopwatch');
     props.onStop(timer);
     timer.classList.remove('active');
+
+    ipcRenderer.send('timersToggled', false);
 }
 
-const resetTimer = (e) => {
+const resetTimer = (e, props) => {
     const thisTimer = e.target.closest('.stopwatch');
     thisTimer.querySelector('#hr').innerHTML = '00';
     thisTimer.querySelector('#min').innerHTML = '00';
     thisTimer.querySelector('#sec').innerHTML = '00';
     thisTimer.querySelector('#count').innerHTML = '00';
     thisTimer.dataset.count = '0';
+
+    props.onStop(thisTimer);
+    thisTimer.classList.remove('active');
+
+    ipcRenderer.send('timersToggled', false);
 }
 
 export { startTimer, stopTimer, resetTimer }

@@ -83,7 +83,7 @@ const Timer = (props) => {
                     Start</button>
                 <button className="btn" id="stop" onClick={(e) => stopTimer(e, props)}>
                     Stop</button>
-                <button className="btn" id="reset" onClick={(e) => resetTimer(e)}>
+                <button className="btn" id="reset" onClick={(e) => resetTimer(e, props)}>
                     Reset</button>
             </div>
         </div>

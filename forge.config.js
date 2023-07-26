@@ -1,6 +1,7 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './src/assets/mpc_icon_200.ico',
   },
   rebuildConfig: {},
   makers: [
