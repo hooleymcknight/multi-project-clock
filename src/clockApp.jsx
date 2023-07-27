@@ -57,7 +57,7 @@ const ClockApp = () => {
     const handleKeyPress = (e) => {
         if (!e.code) return;
 
-        if (e.code === 'Enter') {
+        if (e.code === 'Enter' && isInputValid) {
             closeEditName(e);
         }
         else if (e.code === 'Escape') {
@@ -81,7 +81,9 @@ const ClockApp = () => {
     }
 
     const validateInput = (e) => {
-        if (e.target.value.length < 2) {
+        const currentIndex = e.target.closest('.stopwatch-section').dataset.index;
+        const matchingIds = e.target.closest('.clock-app').querySelectorAll(`.stopwatch-section:not([data-index="${currentIndex}"]) .stopwatch[id="${e.target.value}"]`);
+        if (e.target.value.length < 2 || matchingIds.length) {
             setIsInputValid(false);
         }
         else {
@@ -146,12 +148,12 @@ const ClockApp = () => {
     return (
         <main className="clock-app">
             {
-                timersData.map(x => 
-                    <div key={x.name} className="stopwatch-section">
+                timersData.map((x, idx) => 
+                    <div key={x.name} className="stopwatch-section" data-index={idx}>
                         
                         {editing == x.name ? 
                             <div className="sw-header">
-                                <input type="text" defaultValue={x.name} onChange={(e) => validateInput(e)} onKeyUp={(e) => handleKeyPress(e)}></input>
+                                <input autoFocus="true" type="text" defaultValue={x.name} onChange={(e) => validateInput(e)} onKeyUp={(e) => handleKeyPress(e)}></input>
                                 <button id="edit" disabled={!isInputValid} onClick={(e) => closeEditName(e)}><FontAwesomeIcon icon={faCheck} /></button>
                             </div>
                         :

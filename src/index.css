@@ -121,7 +121,8 @@ button#add {
 }
 
 .stopwatch-section:hover button#remove,
-.stopwatch-section:hover button#edit {
+.stopwatch-section:hover button#edit,
+.stopwatch-section input + button#edit {
   display: flex;
 }
 

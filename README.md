@@ -14,12 +14,12 @@ This app was developed originally for freelancers to track time on multiple proj
 - Esc key in edit name cancels edit
 - user gets a prompt after clicking delete client button: "are you sure?"
 - indicator on toolbar icon that a timer is active (taskbar icon overlay)
+- duplicate client names no longer allowed (causes bugs & confusion)
 
 ## Future updates
 
 - edit time
 - reorder clients
-- duplicate client names should not be allowed (causes bugs)
 - sum line for total hours for the day
 - clear all button
 - lock screen feature
