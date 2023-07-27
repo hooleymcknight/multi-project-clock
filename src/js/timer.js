@@ -1,4 +1,11 @@
-const ipcRenderer = window.require('electron').ipcRenderer;
+const electron = window.require('electron');
+const ipcRenderer = electron.ipcRenderer;
+const path = window.require('path');
+
+console.log(electron)
+// const { remote } = window.require('electron');
+// const BrowserWindow = remote.BrowserWindow;
+// let win = BrowserWindow.getFocusedWindow();
 
 function stopWatch(timer, hour, minute, second, count, totalCount) {
     if (timer.classList.contains('active')) {
@@ -118,6 +125,7 @@ const startTimer = (e, props) => {
     }
 
     ipcRenderer.send('timersToggled', true);
+    // window.setOverlayIcon(path.join(__dirname, ''), 'timers are going');
     stopWatch(timer, hour, minute, second, count, totalCount);
 }
 

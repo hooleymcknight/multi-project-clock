@@ -3,6 +3,7 @@ const path = require('path');
 const Store = require('./store.js');
 
 // import template from './helpers/menu.js'
+import iconOverlay from '../src/assets/mpc_icon_overlay.png';
 
 let mainWindow;
 let closedBySelf = false;
@@ -227,9 +228,14 @@ ipcMain.on('requestAggro', (event, data) => {
 
 ipcMain.on('timersToggled', (event, data) => {
   if (data) {
-    mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname + './../../src/assets/mpc_icon_overlay2.png')), 'timers are going');
+    let nimage = nativeImage.createFromBuffer(Buffer.from(iconOverlay));
+    mainWindow.setOverlayIcon(nimage, 'timers are going');
   }
   else {
     mainWindow.setOverlayIcon(null, 'timers are all stopped');
   }
-})
+});
+
+// move and uncomment the below if needed for testing
+
+// ipcMain.send('testEvent', data);
