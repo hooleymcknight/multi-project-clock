@@ -133,7 +133,7 @@ const createWindow = () => {
       nodeIntegrationInSubFrames: true,
       nodeIntegrationInWorker: true,
       contextIsolation: false,
-      preload: path.join(__dirname + './../../src/preload.js'),
+      // preload: path.join(__dirname + './../../src/preload.js'),
     }
   };
 

@@ -1,5 +1,10 @@
 const ipcRenderer = window.require('electron').ipcRenderer;
 
+function logEvent(event) {
+    let now = new Date();
+    console.log(now, event);
+}
+
 function stopWatch(timer, hour, minute, second, count, totalCount) {
     if (timer.classList.contains('active')) {
         count++;
@@ -73,6 +78,8 @@ function msToTime(duration) {
 
 
 const startTimer = (e, props) => {
+    logEvent('start timer');
+
     const timer = e.target.closest('.stopwatch');
     timer.classList.add('active');
     let totalCount = Number(timer.dataset.count);
@@ -118,11 +125,12 @@ const startTimer = (e, props) => {
     }
 
     ipcRenderer.send('timersToggled', true);
-    // window.setOverlayIcon(path.join(__dirname, ''), 'timers are going');
+    
     stopWatch(timer, hour, minute, second, count, totalCount);
 }
 
 const stopTimer = (e, props) => {
+    logEvent('stop timer');
     const timer = e.target.closest('.stopwatch');
     props.onStop(timer);
     timer.classList.remove('active');
@@ -131,6 +139,8 @@ const stopTimer = (e, props) => {
 }
 
 const resetTimer = (e, props) => {
+    logEvent('reset timer');
+
     const thisTimer = e.target.closest('.stopwatch');
     thisTimer.querySelector('#hr').innerHTML = '00';
     thisTimer.querySelector('#min').innerHTML = '00';
