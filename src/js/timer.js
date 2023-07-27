@@ -118,6 +118,7 @@ const startTimer = (e, props) => {
     }
 
     ipcRenderer.send('timersToggled', true);
+    // window.setOverlayIcon(path.join(__dirname, ''), 'timers are going');
     stopWatch(timer, hour, minute, second, count, totalCount);
 }
 

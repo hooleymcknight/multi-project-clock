@@ -26,6 +26,13 @@ module.exports = [
       }
     }
   },
+  {
+    test: /\.(bin|raw|png|ico|svg|jpg|jpeg|gif)$/,
+    type: 'asset/inline',
+    generator: {
+      dataUrl: content => content
+    }
+  },
   // {
   //   test: /\.js$/,
   //   exclude: 'node_modules',
