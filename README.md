@@ -18,6 +18,7 @@ This app was developed originally for freelancers to track time on multiple proj
 
 ## Future updates
 
+- fix stopwatch pause on minimize
 - edit time
 - reorder clients
 - sum line for total hours for the day

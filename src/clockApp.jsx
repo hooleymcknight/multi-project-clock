@@ -6,10 +6,10 @@ import Timer from "./components/timer.jsx";
 import ConfirmModal from './components/confirmModal.jsx';
 const ipcRenderer = window.require('electron').ipcRenderer;
 
-// ipcRenderer.on('testEvent', (event, data) => {
-//     console.log('test event received')
-//     if (data) console.log(data);
-// })
+ipcRenderer.on('testEvent', (event, data) => {
+    console.log('test event received')
+    if (data) console.log(data);
+})
 
 ipcRenderer.on('darkModeToggle', (event, data) => {
     if (data) {

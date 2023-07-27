@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } = require('electron');
 const path = require('path');
 const Store = require('./store.js');
 
@@ -145,6 +145,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow(settings);
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.setMinimizable(false);
 
   if (store.get('darkMode')) {
     mainWindow.webContents.on('did-finish-load', () => {
@@ -157,8 +158,6 @@ const createWindow = () => {
       mainWindow.webContents.send('aggroModeToggle', true);
     })
   }
-
-  
 
   mainWindow.on('resize', () => {
     const { width, height } = mainWindow.getBounds();
@@ -176,6 +175,8 @@ const createWindow = () => {
       mainWindow.webContents.send('saveTimers');
     }
   })
+
+  return mainWindow;
 }
 
 // This method will be called when Electron has finished
@@ -198,7 +199,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    mainWindow = createWindow();
   }
 });
 
