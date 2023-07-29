@@ -20,10 +20,10 @@ ipcRenderer.on('darkModeToggle', (event, data) => {
     }
 })
 
-function logEvent(event) {
-    let now = new Date();
-    console.log(now, event);
-}
+// function logEvent(event) {
+//     let now = new Date();
+//     console.log(now, event);
+// }
 
 const ClockApp = () => {
     const [timersData, setTimersData] = React.useState([])
@@ -36,8 +36,18 @@ const ClockApp = () => {
         setIsAggro(data);
     })
 
+    ipcRenderer.on('updateTime', (event, data) => {
+        let newData = JSON.parse(data);
+        // console.log(timersData);
+        console.log(newData.count)
+        const newTimersData = [...timersData];
+        const indexToReplace = newTimersData.indexOf(newTimersData.filter(x => x.name === newData.id)[0]);
+        newTimersData[indexToReplace] = { name: newData.id, count: Number(newData.count) };
+        // console.log(newTimersData);
+        setTimersData(newTimersData);
+    })
+
     const stopHandler = (timer, closingWindow) => {
-        logEvent('stop handler');
         const newCount = timer.dataset.count;
         const timerId = timer.id;
 
@@ -98,7 +108,6 @@ const ClockApp = () => {
     }
 
     const addHandler = () => {
-        logEvent('add handler');
         const newItemNumber = timersData.length + 1;
         const newItem = {
             name: `Client #${newItemNumber}`,
@@ -128,7 +137,6 @@ const ClockApp = () => {
 
     React.useEffect(() => {
         ipcRenderer.on('saveTimers', () => {
-            logEvent('use effect, ipc saveTimers');
             const activeTimers = document.querySelectorAll('.stopwatch.active');
             if (activeTimers.length) {
                 activeTimers.forEach((timer) => {
@@ -147,7 +155,6 @@ const ClockApp = () => {
         })
 
         if (timersData.length > 0) return;
-        logEvent('use effect, loadSavedTimers');
         ipcRenderer.send('loadSavedTimers', []);
         ipcRenderer.on('loadSavedTimersReply', (event, data) => {
             setTimersData(data);

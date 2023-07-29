@@ -5,58 +5,58 @@ const ipcRenderer = window.require('electron').ipcRenderer;
 //     console.log(now, event);
 // }
 
-function stopWatch(timer, hour, minute, second, count, totalCount) {
-    if (timer.classList.contains('active')) {
-        count++;
-        totalCount++;
+// function stopWatch(timer, hour, minute, second, count, totalCount) {
+//     if (timer.classList.contains('active')) {
+//         count++;
+//         totalCount++;
 
-        if (count == 100) {
-            second++;
-            count = 0;
-        }
+//         if (count == 100) {
+//             second++;
+//             count = 0;
+//         }
     
-        if (second == 60) {
-            minute++;
-            second = 0;
-        }
+//         if (second == 60) {
+//             minute++;
+//             second = 0;
+//         }
     
-        if (minute == 60) {
-            hour++;
-            minute = 0;
-            second = 0;
-        }
+//         if (minute == 60) {
+//             hour++;
+//             minute = 0;
+//             second = 0;
+//         }
     
-        let hrString = hour;
-        let minString = minute;
-        let secString = second;
-        let countString = count;
+//         let hrString = hour;
+//         let minString = minute;
+//         let secString = second;
+//         let countString = count;
     
-        if (hour < 10 && hrString !== '00') {
-            hrString = "0" + hrString;
-        }
+//         if (hour < 10 && hrString !== '00') {
+//             hrString = "0" + hrString;
+//         }
     
-        if (minute < 10 && minString !== '00') {
-            minString = "0" + minString;
-        }
+//         if (minute < 10 && minString !== '00') {
+//             minString = "0" + minString;
+//         }
     
-        if (second < 10 && secString !== '00') {
-            secString = "0" + secString;
-        }
+//         if (second < 10 && secString !== '00') {
+//             secString = "0" + secString;
+//         }
     
-        if (count < 10 && countString !== '00') {
-            countString = "0" + countString;
-        }
+//         if (count < 10 && countString !== '00') {
+//             countString = "0" + countString;
+//         }
     
-        timer.querySelector('#hr').innerHTML = hrString;
-        timer.querySelector('#min').innerHTML = minString;
-        timer.querySelector('#sec').innerHTML = secString;
-        timer.querySelector('#count').innerHTML = countString;
-        timer.dataset.count = totalCount;
-        setTimeout(() => {
-            stopWatch(timer, hour, minute, second, count, totalCount);
-        }, 10);
-    }
-}
+//         timer.querySelector('#hr').innerHTML = hrString;
+//         timer.querySelector('#min').innerHTML = minString;
+//         timer.querySelector('#sec').innerHTML = secString;
+//         timer.querySelector('#count').innerHTML = countString;
+//         timer.dataset.count = totalCount;
+//         setTimeout(() => {
+//             stopWatch(timer, hour, minute, second, count, totalCount);
+//         }, 10);
+//     }
+// }
 
 function msToTime(duration) {
     var milliseconds = Math.floor((duration % 100) / 1),
@@ -123,8 +123,15 @@ const startTimer = (e, props) => {
     }
 
     ipcRenderer.send('timersToggled', true);
-    
-    stopWatch(timer, hour, minute, second, count, totalCount);
+
+    const stopWatchData = {
+        id: timer.id,
+        count: totalCount,
+        active: timer.classList.contains('active') // true or false
+    }
+
+    ipcRenderer.send('stopWatch', stopWatchData);
+    // stopWatch(timer, hour, minute, second, count, totalCount);
 }
 
 const stopTimer = (e, props) => {
@@ -133,6 +140,14 @@ const stopTimer = (e, props) => {
     timer.classList.remove('active');
 
     ipcRenderer.send('timersToggled', false);
+
+    const stopWatchData = {
+        id: timer.id,
+        count: 0, // I dont think this value matters either.
+        active: timer.classList.contains('active') // true or false
+    }
+
+    ipcRenderer.send('stopWatch', stopWatchData);
 }
 
 const resetTimer = (e, props) => {
@@ -147,6 +162,14 @@ const resetTimer = (e, props) => {
     thisTimer.classList.remove('active');
 
     ipcRenderer.send('timersToggled', false);
+
+    const stopWatchData = {
+        id: thisTimer.id,
+        count: 0, // I dont think this value matters.
+        active: thisTimer.classList.contains('active') // true or false
+    }
+
+    ipcRenderer.send('stopWatch', stopWatchData);
 }
 
 export { startTimer, stopTimer, resetTimer }

@@ -3,6 +3,7 @@ const path = require('path');
 const Store = require('./store.js');
 
 // import template from './helpers/menu.js'
+import { stopWatch, swTimeouts } from './js/timerBE.js';
 import iconOverlay from '../src/assets/mpc_icon_overlay.png';
 
 let mainWindow;
@@ -145,7 +146,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow(settings);
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  mainWindow.setMinimizable(false);
+  // mainWindow.setMinimizable(false);
 
   if (store.get('darkMode')) {
     mainWindow.webContents.on('did-finish-load', () => {
@@ -158,6 +159,20 @@ const createWindow = () => {
       mainWindow.webContents.send('aggroModeToggle', true);
     })
   }
+
+  mainWindow.on('restore', () => {
+    // clearTimeout(swTimeout); // ============================================= use this elsewhere
+    // clearTimeout(swTimeout)
+    // console.log('des', swTimeout._destroyed)
+
+    // check if a timer is currently running
+    // { id: data.id, timeout: swTimeout }
+    const runningTimers = swTimeouts.filter(x => x.timeout._destroyed == false);
+    if (runningTimers.length) {
+      // if so, make sure it's updated in the front end
+      mainWindow.webContents.send('loadSavedTimersReply', allTimers);
+    }
+  });
 
   mainWindow.on('resize', () => {
     const { width, height } = mainWindow.getBounds();
@@ -236,6 +251,11 @@ ipcMain.on('timersToggled', (event, data) => {
     mainWindow.setOverlayIcon(null, 'timers are all stopped');
   }
 });
+
+ipcMain.on('stopWatch', (event, data) => {
+  data.win = mainWindow;
+  stopWatch(data);
+})
 
 // move and uncomment the below if needed for testing
 
