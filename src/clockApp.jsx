@@ -2,13 +2,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencil, faCheck, faSquareXmark, faPlus } from '@fortawesome/free-solid-svg-icons'
-import { updateTimeStrings, msToTime } from './js/timer.js';
 import Timer from "./components/timer.jsx";
 import ConfirmModal from './components/confirmModal.jsx';
 const ipcRenderer = window.require('electron').ipcRenderer;
 
 ipcRenderer.on('testEvent', (event, data) => {
-    console.log('test event received')
+    console.log('test event received');
     if (data) console.log(data);
 })
 
@@ -39,12 +38,9 @@ const ClockApp = () => {
 
     ipcRenderer.on('updateTime', (event, data) => {
         let newData = JSON.parse(data);
-        // console.log(timersData);
-        console.log(newData.count)
         const newTimersData = [...timersData];
         const indexToReplace = newTimersData.indexOf(newTimersData.filter(x => x.name === newData.id)[0]);
         newTimersData[indexToReplace] = { name: newData.id, count: Number(newData.count) };
-        // console.log(newTimersData);
         setTimersData(newTimersData);
     })
 
@@ -136,27 +132,6 @@ const ClockApp = () => {
         setDeleting('');
     }
 
-    
-
-    // ipcRenderer.on('loadSavedTimersReply', (event, data) => {
-    //     // console.log('save timers reply clockapp', data)
-    //     // manually update all the timers
-    //     // data.forEach((clockData) => {
-    //     //     const thisWatch = document.querySelector(`.stopwatch.active[id="${clockData.name}"]`);
-    //     //     console.log('this watch', thisWatch);
-    //     //     if (thisWatch) {
-    //     //         thisWatch.dataset.count = clockData.count;
-    //     //         console.log(clockData.count);
-    //     //         const times = msToTime(clockData.count); // returns { setHours: hours, setMinutes: minutes, setSeconds: seconds, setMS: milliseconds }
-    //     //         console.log(times)
-    //     //         // console.log(hr, min, sec, cnt);
-    //     //         // updateTimeStrings(thisWatch, times.setHours, times.setMinutes, times.setSeconds, times.setMS);
-    //     //     }
-    //     // });
-    //     // console.log('set timers data')
-    //     setTimersData(data);
-    // });
-
     React.useEffect(() => {
         ipcRenderer.on('stopAllTimers', (event) => {
             const activeTimers = document.querySelectorAll('.stopwatch.active');
@@ -186,7 +161,6 @@ const ClockApp = () => {
         });
 
         ipcRenderer.on('loadSavedTimersReply', (event, data) => {
-            console.log('data', data);
             setTimersData(data);
         });
 

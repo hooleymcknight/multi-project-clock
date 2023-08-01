@@ -28,7 +28,6 @@ function stopWatch(data) {
     if (swTimeouts.filter(x => x !== null).filter(x => x.id === data.id).length) { // timeout exists
         swTimeout = swTimeouts.filter(x => x !== null).filter(x => x.id === data.id)[0].timeout;
         swTimeouts.filter(x => x !== null).filter(x => x.id === data.id)[0].count = Number(data.count);
-        // console.log(Number(data.count))
         clearTimeout(swTimeout);
     }
     else { // need to create timeout
@@ -55,9 +54,4 @@ function stopWatch(data) {
     }
 }
 
-function getSwTimeouts() {
-    return swTimeouts;
-}
-
-
-export { stopWatch, swTimeouts, getSwTimeouts }
+export { stopWatch, swTimeouts }

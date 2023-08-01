@@ -11,22 +11,6 @@ function updateTimeStrings(timer, hour, minute, second, count) {
     let secString = second;
     let countString = count;
 
-    // if (hour < 10 && hrString !== '00') {
-    //     hrString = "0" + hrString;
-    // }
-
-    // if (minute < 10 && minString !== '00') {
-    //     minString = "0" + minString;
-    // }
-
-    // if (second < 10 && secString !== '00') {
-    //     secString = "0" + secString;
-    // }
-
-    // if (count < 10 && countString !== '00') {
-    //     countString = "0" + countString;
-    // }
-
     timer.querySelector('#hr').innerHTML = hrString;
     timer.querySelector('#min').innerHTML = minString;
     timer.querySelector('#sec').innerHTML = secString;
@@ -41,31 +25,14 @@ function displayStopWatch(timer, hour, minute, second, count) {
     }
     if (timer.classList.contains('active')) {
         let totalCount = timer.dataset.count;
-        // count++;
         totalCount++;
 
-        // if (count == 100) {
-        //     second++;
-        //     count = 0;
-        // }
-    
-        // if (second == 60) {
-        //     minute++;
-        //     second = 0;
-        // }
-    
-        // if (minute == 60) {
-        //     hour++;
-        //     minute = 0;
-        //     second = 0;
-        // }
         let times = msToTime(totalCount)
 
-        // updateTimeStrings(timer, hour, minute, second, count);
         updateTimeStrings(timer, times.setHours, times.setMinutes, times.setSeconds, times.setMS);
         timer.dataset.count = totalCount;
+
         currentTimeout = setTimeout(() => {
-            // displayStopWatch(timer, hour, minute, second, count);
             displayStopWatch(timer);
         }, 10);
     }
@@ -91,7 +58,6 @@ function msToTime(duration) {
 
 
 const startTimer = (e, props) => {
-    console.log('start timer function')
     let timer;
     if (e === null) {
         timer = document.querySelector(`.stopwatch[id="${props.name}"]`);
