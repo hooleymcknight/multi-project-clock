@@ -5,58 +5,71 @@ const ipcRenderer = window.require('electron').ipcRenderer;
 //     console.log(now, event);
 // }
 
-// function stopWatch(timer, hour, minute, second, count, totalCount) {
-//     if (timer.classList.contains('active')) {
-//         count++;
-//         totalCount++;
+function updateTimeStrings(timer, hour, minute, second, count) {
+    let hrString = hour;
+    let minString = minute;
+    let secString = second;
+    let countString = count;
 
-//         if (count == 100) {
-//             second++;
-//             count = 0;
-//         }
+    // if (hour < 10 && hrString !== '00') {
+    //     hrString = "0" + hrString;
+    // }
+
+    // if (minute < 10 && minString !== '00') {
+    //     minString = "0" + minString;
+    // }
+
+    // if (second < 10 && secString !== '00') {
+    //     secString = "0" + secString;
+    // }
+
+    // if (count < 10 && countString !== '00') {
+    //     countString = "0" + countString;
+    // }
+
+    timer.querySelector('#hr').innerHTML = hrString;
+    timer.querySelector('#min').innerHTML = minString;
+    timer.querySelector('#sec').innerHTML = secString;
+    timer.querySelector('#count').innerHTML = countString;
+}
+
+let currentTimeout = null
+
+function displayStopWatch(timer, hour, minute, second, count) {
+    if (currentTimeout !== null) {
+        clearTimeout(currentTimeout)
+    }
+    if (timer.classList.contains('active')) {
+        let totalCount = timer.dataset.count;
+        // count++;
+        totalCount++;
+
+        // if (count == 100) {
+        //     second++;
+        //     count = 0;
+        // }
     
-//         if (second == 60) {
-//             minute++;
-//             second = 0;
-//         }
+        // if (second == 60) {
+        //     minute++;
+        //     second = 0;
+        // }
     
-//         if (minute == 60) {
-//             hour++;
-//             minute = 0;
-//             second = 0;
-//         }
-    
-//         let hrString = hour;
-//         let minString = minute;
-//         let secString = second;
-//         let countString = count;
-    
-//         if (hour < 10 && hrString !== '00') {
-//             hrString = "0" + hrString;
-//         }
-    
-//         if (minute < 10 && minString !== '00') {
-//             minString = "0" + minString;
-//         }
-    
-//         if (second < 10 && secString !== '00') {
-//             secString = "0" + secString;
-//         }
-    
-//         if (count < 10 && countString !== '00') {
-//             countString = "0" + countString;
-//         }
-    
-//         timer.querySelector('#hr').innerHTML = hrString;
-//         timer.querySelector('#min').innerHTML = minString;
-//         timer.querySelector('#sec').innerHTML = secString;
-//         timer.querySelector('#count').innerHTML = countString;
-//         timer.dataset.count = totalCount;
-//         setTimeout(() => {
-//             stopWatch(timer, hour, minute, second, count, totalCount);
-//         }, 10);
-//     }
-// }
+        // if (minute == 60) {
+        //     hour++;
+        //     minute = 0;
+        //     second = 0;
+        // }
+        let times = msToTime(totalCount)
+
+        // updateTimeStrings(timer, hour, minute, second, count);
+        updateTimeStrings(timer, times.setHours, times.setMinutes, times.setSeconds, times.setMS);
+        timer.dataset.count = totalCount;
+        currentTimeout = setTimeout(() => {
+            // displayStopWatch(timer, hour, minute, second, count);
+            displayStopWatch(timer);
+        }, 10);
+    }
+}
 
 function msToTime(duration) {
     var milliseconds = Math.floor((duration % 100) / 1),
@@ -78,7 +91,15 @@ function msToTime(duration) {
 
 
 const startTimer = (e, props) => {
-    const timer = e.target.closest('.stopwatch');
+    console.log('start timer function')
+    let timer;
+    if (e === null) {
+        timer = document.querySelector(`.stopwatch[id="${props.name}"]`);
+    }
+    else {
+        timer = e.target.closest('.stopwatch');
+    }
+    
     timer.classList.add('active');
     let totalCount = Number(timer.dataset.count);
 
@@ -131,7 +152,7 @@ const startTimer = (e, props) => {
     }
 
     ipcRenderer.send('stopWatch', stopWatchData);
-    // stopWatch(timer, hour, minute, second, count, totalCount);
+    displayStopWatch(timer, hour, minute, second, count, totalCount);
 }
 
 const stopTimer = (e, props) => {
@@ -172,4 +193,4 @@ const resetTimer = (e, props) => {
     ipcRenderer.send('stopWatch', stopWatchData);
 }
 
-export { startTimer, stopTimer, resetTimer }
+export { startTimer, stopTimer, resetTimer, updateTimeStrings, msToTime }

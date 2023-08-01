@@ -13,7 +13,7 @@
 */
 
 let swTimeouts = [
-    null, // { id: data.id, timeout: swTimeout }
+    null, // { id: data.id, count: count, timeout: swTimeout }
     null,
     null,
     null,
@@ -27,11 +27,13 @@ function stopWatch(data) {
     let swTimeout;
     if (swTimeouts.filter(x => x !== null).filter(x => x.id === data.id).length) { // timeout exists
         swTimeout = swTimeouts.filter(x => x !== null).filter(x => x.id === data.id)[0].timeout;
+        swTimeouts.filter(x => x !== null).filter(x => x.id === data.id)[0].count = Number(data.count);
+        // console.log(Number(data.count))
         clearTimeout(swTimeout);
     }
     else { // need to create timeout
         const indexToSet = swTimeouts.indexOf(swTimeouts.filter(x => x === null)[0]);
-        swTimeouts[indexToSet] = { id: data.id, timeout: null };
+        swTimeouts[indexToSet] = { id: data.id, count: Number(data.count), timeout: null };
     }
 
     let totalCount = Number(data.count);
@@ -53,5 +55,9 @@ function stopWatch(data) {
     }
 }
 
+function getSwTimeouts() {
+    return swTimeouts;
+}
 
-export { stopWatch, swTimeouts }
+
+export { stopWatch, swTimeouts, getSwTimeouts }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPencil, faCheck, faSquareXmark, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { updateTimeStrings, msToTime } from './js/timer.js';
 import Timer from "./components/timer.jsx";
 import ConfirmModal from './components/confirmModal.jsx';
 const ipcRenderer = window.require('electron').ipcRenderer;
@@ -26,7 +27,7 @@ ipcRenderer.on('darkModeToggle', (event, data) => {
 // }
 
 const ClockApp = () => {
-    const [timersData, setTimersData] = React.useState([])
+    const [timersData, setTimersData] = React.useState([]);
     const [editing, setEditing] = React.useState('');
     const [isInputValid, setIsInputValid] = React.useState(true);
     const [deleting, setDeleting] = React.useState('');
@@ -135,7 +136,37 @@ const ClockApp = () => {
         setDeleting('');
     }
 
+    
+
+    // ipcRenderer.on('loadSavedTimersReply', (event, data) => {
+    //     // console.log('save timers reply clockapp', data)
+    //     // manually update all the timers
+    //     // data.forEach((clockData) => {
+    //     //     const thisWatch = document.querySelector(`.stopwatch.active[id="${clockData.name}"]`);
+    //     //     console.log('this watch', thisWatch);
+    //     //     if (thisWatch) {
+    //     //         thisWatch.dataset.count = clockData.count;
+    //     //         console.log(clockData.count);
+    //     //         const times = msToTime(clockData.count); // returns { setHours: hours, setMinutes: minutes, setSeconds: seconds, setMS: milliseconds }
+    //     //         console.log(times)
+    //     //         // console.log(hr, min, sec, cnt);
+    //     //         // updateTimeStrings(thisWatch, times.setHours, times.setMinutes, times.setSeconds, times.setMS);
+    //     //     }
+    //     // });
+    //     // console.log('set timers data')
+    //     setTimersData(data);
+    // });
+
     React.useEffect(() => {
+        ipcRenderer.on('stopAllTimers', (event) => {
+            const activeTimers = document.querySelectorAll('.stopwatch.active');
+            if (activeTimers.length) {
+                activeTimers.forEach((timer) => {
+                    stopHandler(timer);
+                });
+            }
+        });
+
         ipcRenderer.on('saveTimers', () => {
             const activeTimers = document.querySelectorAll('.stopwatch.active');
             if (activeTimers.length) {
@@ -152,20 +183,22 @@ const ClockApp = () => {
         ipcRenderer.send('requestAggro');
         ipcRenderer.on('sendAggroState', (event, data) => {
             setIsAggro(data);
-        })
+        });
+
+        ipcRenderer.on('loadSavedTimersReply', (event, data) => {
+            console.log('data', data);
+            setTimersData(data);
+        });
 
         if (timersData.length > 0) return;
         ipcRenderer.send('loadSavedTimers', []);
-        ipcRenderer.on('loadSavedTimersReply', (event, data) => {
-            setTimersData(data);
-        })
     }, [timersData]);
 
     return (
         <main className="clock-app">
             {
                 timersData.map((x, idx) => 
-                    <div key={x.name} className="stopwatch-section" data-index={idx}>
+                    <div key={x.name} className="stopwatch-section" data-index={idx} data-count-on-load={x.count}>
                         
                         {editing == x.name ? 
                             <div className="sw-header">
@@ -183,7 +216,7 @@ const ClockApp = () => {
                             <FontAwesomeIcon icon={faSquareXmark} />
                         </button>
 
-                        <Timer name={x.name} count={x.count} onStop={(e) => stopHandler(e)}></Timer>
+                        <Timer name={x.name} count={x.count} active={x.active} onStop={(e) => stopHandler(e)}></Timer>
                     </div>
                 )
             }

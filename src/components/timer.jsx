@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {startTimer, stopTimer, resetTimer} from '../js/timer.js';
+import { startTimer, stopTimer, resetTimer } from '../js/timer.js';
 
 function msToTime(duration) {
     var milliseconds = Math.floor((duration % 100) / 1),
@@ -46,7 +46,7 @@ const Timer = (props) => {
     }
 
     return (
-        <div className="stopwatch" id={props.name} data-count={props.count}>
+        <div className={props.active ? "stopwatch active" : "stopwatch"} id={props.name} data-count={props.count}>
             <div className="time">
                 <div className="timeElement">
                     <span className="digit" id="hr">
@@ -79,7 +79,7 @@ const Timer = (props) => {
                 </div>
             </div>
             <div className="buttons">
-                <button className="btn" id="start" onClick={(e) => startTimer(e, props)}>
+                <button className="btn" id="start" onClick={(e) => startTimer(e, props)} onLoad={props.active ? startTimer(null, props) : null}>
                     Start</button>
                 <button className="btn" id="stop" onClick={(e) => stopTimer(e, props)}>
                     Stop</button>

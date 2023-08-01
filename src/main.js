@@ -3,7 +3,8 @@ const path = require('path');
 const Store = require('./store.js');
 
 // import template from './helpers/menu.js'
-import { stopWatch, swTimeouts } from './js/timerBE.js';
+import { stopWatch, swTimeouts, getSwTimeouts } from './js/timerBE.js';
+import getAllTimers from './helpers/getAllTimers.js';
 import iconOverlay from '../src/assets/mpc_icon_overlay.png';
 
 let mainWindow;
@@ -21,7 +22,7 @@ const store = new Store({
     clientTimers: [
       {
         name: 'Client #1',
-        count: '0'
+        count: 0
       }
     ],
   }
@@ -117,15 +118,15 @@ const template = [
   }
 ]
 
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
 
 const createWindow = () => {
   let { width, height } = store.get('windowBounds');
   let x = store.get('windowPosition')?.x;
   let y = store.get('windowPosition')?.y;
 
-  let settings = { 
+  let settings = {
     width,
     height,
     icon: path.join(__dirname + './../../src/assets/mpc_icon_200.png'),
@@ -151,25 +152,42 @@ const createWindow = () => {
   if (store.get('darkMode')) {
     mainWindow.webContents.on('did-finish-load', () => {
       mainWindow.webContents.send('darkModeToggle', true);
-    })
+    });
   }
 
   if (store.get('aggroMode')) {
     mainWindow.webContents.on('did-finish-load', () => {
       mainWindow.webContents.send('aggroModeToggle', true);
-    })
+    });
   }
+
+  mainWindow.on('minimize', () => {
+    // console.log('stop frontend running timers')
+    console.log('send stopAllTimers')
+    mainWindow.webContents.send('stopAllTimers');
+  })
 
   mainWindow.on('restore', () => {
     // clearTimeout(swTimeout); // ============================================= use this elsewhere
-    // clearTimeout(swTimeout)
-    // console.log('des', swTimeout._destroyed)
+    // clearTimeout(swTimeout);
+    // console.log('des', swTimeout._destroyed);
 
     // check if a timer is currently running
-    // { id: data.id, timeout: swTimeout }
-    const runningTimers = swTimeouts.filter(x => x.timeout._destroyed == false);
+    // { id: data.id, count: totalCount, timeout: swTimeout }
+
+    // const swTimeouts = getSwTimeouts();
+    // console.log(swTimeouts) // { id: data.id, count: totalCount, timeout: swTimeout }
+    const runningTimers = swTimeouts.filter(x => x !== null).filter(x => x.timeout?._destroyed == false);
     if (runningTimers.length) {
+      // clear all currently running timers
+      swTimeouts.filter(x => x !== null).forEach((obj) => {
+        clearTimeout(obj.timeout);
+      })
       // if so, make sure it's updated in the front end
+      const allTimers = getAllTimers(store, runningTimers);
+      console.log(runningTimers[0].count);
+      // console.log(allTimers)
+      console.log('send loadsaved timers reply, 180ish')
       mainWindow.webContents.send('loadSavedTimersReply', allTimers);
     }
   });
@@ -189,7 +207,7 @@ const createWindow = () => {
       e.preventDefault();
       mainWindow.webContents.send('saveTimers');
     }
-  })
+  });
 
   return mainWindow;
 }
@@ -253,9 +271,10 @@ ipcMain.on('timersToggled', (event, data) => {
 });
 
 ipcMain.on('stopWatch', (event, data) => {
+  // console.log('stopwatch event received')
   data.win = mainWindow;
   stopWatch(data);
-})
+});
 
 // move and uncomment the below if needed for testing
 
