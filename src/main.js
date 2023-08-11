@@ -127,7 +127,7 @@ const createWindow = () => {
   let settings = { 
     width,
     height,
-    // icon: path.join(__dirname + './../../src/assets/mpc_icon_200.png'),
+    icon: path.join(__dirname + './../../src/assets/mpc_icon_200.png'),
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInSubFrames: true,
