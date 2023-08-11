@@ -195,3 +195,25 @@ button#remove:hover svg {
   text-align: center;
   width: 100%;
 }
+
+.input-field {
+  font-family: 'Poppins';
+  font-size: 16px;
+  padding: 10px;
+  border: 2px solid var(--dark-purple);
+  border-radius: 6px;
+  background-color: var(--off-white);
+  color: inherit;
+  width: 100%;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--light-purple);
+}
+
+html.dark-mode .input-field {
+  background-color: var(--dark-bg);
+}
