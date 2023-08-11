@@ -153,7 +153,7 @@ const ClockApp = () => {
                         
                         {editing == x.name ? 
                             <div className="sw-header">
-                                <input autoFocus="true" type="text" defaultValue={x.name} onChange={(e) => validateInput(e)} onKeyUp={(e) => handleKeyPress(e)}></input>
+                                <input className="input-field" autoFocus="true" type="text" defaultValue={x.name} onChange={(e) => validateInput(e)} onKeyUp={(e) => handleKeyPress(e)}></input>
                                 <button id="edit" disabled={!isInputValid} onClick={(e) => closeEditName(e)}><FontAwesomeIcon icon={faCheck} /></button>
                             </div>
                         :

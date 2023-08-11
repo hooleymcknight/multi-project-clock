@@ -3,7 +3,7 @@ const path = require('path');
 const Store = require('./store.js');
 
 // import template from './helpers/menu.js'
-import iconOverlay from '../src/assets/mpc_icon_overlay.png';
+// import iconOverlay from '../src/assets/mpc_icon_overlay.png';
 
 let mainWindow;
 let closedBySelf = false;
